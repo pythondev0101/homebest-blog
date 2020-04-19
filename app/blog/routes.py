@@ -30,6 +30,7 @@ from . import blog_templates
 """--------------END--------------"""
 from datetime import datetime
 from app.admin.routes import admin_index
+from app.auth.routes import load_permissions
 
 # This function will change context values depends in view
 def change_context(view):
@@ -45,10 +46,10 @@ def change_context(view):
 def index():
     if current_user.is_authenticated:
         posts = Post.query.filter_by(user_id=current_user.id).all()
-        print(posts)
         change_context('index')
         return render_template(blog_templates['index'], context=context,posts=posts)
     else:
+        load_permissions(0)
         posts = Post.query.all()
         change_context('index')
         return render_template(blog_templates['index'], context=context,posts=posts)
