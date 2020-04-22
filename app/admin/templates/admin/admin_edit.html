@@ -10,10 +10,15 @@
                 <div>
                     {{ edit_title }}
                     <div class="page-title-subheading">
-                        {{ edit_message}}
+                    {{ edit_message}}
                     </div>
                 </div>
             </div>
+            {% block actions %}
+            {% if action %}
+            {% include action %}
+            {% endif %}
+            {% endblock %}
         </div>
     </div>
     <form action="{{ url_for(update_url,oid=oid) }}" id="edit_form"
@@ -48,7 +53,7 @@
                     {% else %}
                     <div class="col-md-4 mb-3">
                         <label for="{{ field.name }}">{{ field.label }}</label>
-                        <input type="{{ field.type }}" class="form-control" id="{{ field.name }}"
+                        <input style="font-weight: bold;" type="{{ field.type }}" class="form-control" id="{{ field.name }}"
                                name="{{ field.name }}"
                                placeholder="{{ field.label }}"
                                required value="{{ field.value }}">
@@ -113,20 +118,54 @@
 
 {% block inner_footer %}
 <div class="app-footer-right">
-    <button type="button" class="btn btn-secondary">Cancel</button>
+    <button type="button" class="btn btn-secondary" onclick="history.back(-1)" 
+    style="margin-right: 10px;">Cancel</button>
     <button form="edit_form" type="submit" class="btn btn-primary">Save</button>
 </div>
 {% endblock %}
 
+{% block toast %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="toast-container" class="toast-top-center">
+    {% for message in messages %}
+    <div class="toast toast-success" aria-live="polite">
+        <div class="toast-progress" style="width: 0%;"></div>
+        <button type="button" class="toast-close-button" role="button" onclick="close_toast()">×</button>
+        <div class="toast-title">Saved!</div>
+        <div class="toast-message">{{ message }}</div>
+    </div>
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if context['errors'] %}
+<div id="toast-container" class="toast-top-center">
+    {% for key,error in context['errors'].items() %}
+    <div class="toast toast-error" aria-live="polite">
+        <div class="toast-progress" style="width: 0%;"></div>
+        <button type="button" class="toast-close-button" role="button" onclick="close_toast()">×</button>
+        <div class="toast-title">Error!</div>
+        <div class="toast-message">{{ key, error }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% if context['active'] == 'Users' %}
 {% block scripts %}
 <script>
   function edit_chk(permission_id){
   var input_read = document.getElementById("edit_chk_read_".concat(permission_id)).checked;
+  var input_create = document.getElementById("edit_chk_create_".concat(permission_id)).checked;
   var input_write = document.getElementById("edit_chk_write_".concat(permission_id)).checked;
   var input_delete = document.getElementById("edit_chk_delete_".concat(permission_id)).checked;
   var csrf_token = "{{ csrf_token() }}";
   var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("post", "http://localhost:5000/auth/user_edit_permission",true);
+  xmlHttp.open("post", "/auth/user_edit_permission",true);
   xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xmlHttp.onreadystatechange = function(){
     if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
@@ -138,15 +177,10 @@
     }
   }
   xmlHttp.setRequestHeader("X-CSRFToken", csrf_token);
-  var data = JSON.stringify({"permission_id": permission_id,"read": input_read, "write": input_write, "delete": input_delete});
+  var data = JSON.stringify({"permission_id": permission_id,"read": input_read, "create": input_create,
+   "write": input_write, "delete": input_delete});
   xmlHttp.send(data);
   }
-
-
-
-
-
-
-
 </script>
 {% endblock %}
+{% endif %}

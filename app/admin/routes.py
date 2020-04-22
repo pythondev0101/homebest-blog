@@ -1,22 +1,19 @@
 """ MODULE: ADMIN.ROUTES """
 """ FLASK IMPORTS """
-from flask import render_template, flash, redirect, url_for, request, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app,g
 from flask_login import login_required
-
 """--------------END--------------"""
 
 """ APP IMPORTS  """
-from app import system_modules
 from app.admin import bp_admin
 
 """--------------END--------------"""
 
 """ TEMPLATES IMPORTS """
 from . import admin_templates
-
 """--------------END--------------"""
-from . import context
 
+from app import context
 
 @bp_admin.route('/')
 @login_required
@@ -27,7 +24,7 @@ def index():
     return render_template(admin_templates['index'], context=context)
 
 
-def admin_edit(form, fields_data, update_url, oid, modal_form=False, template="admin/admin_edit.html"):
+def admin_edit(form, fields_data, update_url, oid, modal_form=False, action=None, extra_modal=None , template="admin/admin_edit.html"):
     # Note: fields_data is just temporary
     # TODO: inherit flask form to get values in constructor
     fields = []
@@ -51,7 +48,7 @@ def admin_edit(form, fields_data, update_url, oid, modal_form=False, template="a
     }
 
     return render_template(template, context=context, form=form, update_url=update_url,
-                           oid=oid,modal_form=modal_form,edit_title=form.edit_title,)
+                           oid=oid,modal_form=modal_form,edit_title=form.edit_title,action=action,extra_modal=extra_modal)
 
 
 def admin_index(*model, fields, url, form, action="admin/admin_actions.html",
