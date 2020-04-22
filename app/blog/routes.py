@@ -31,7 +31,7 @@ from . import blog_templates
 from datetime import datetime
 from app.admin.routes import admin_index
 from app.auth.routes import load_permissions
-
+from .forms import PostForm
 # This function will change context values depends in view
 def change_context(view):
     # VALUES: title, module, active, forms, modal
@@ -77,9 +77,10 @@ def post_create():
 @login_required
 def post_edit():
     if request.method == "GET":
+        form = PostForm()
         fields = [Post.id,Post.post_title,Post.created_at,Post.updated_at]
         return admin_index(Post,fields=fields,url=blog_urls['index'],create_modal=False,
-                           view_modal=False,template='blog/post_edit_index.html')
+                           view_modal=False,template='blog/post_edit_index.html',form=form)
 
 
 @bp_blog.route('/post_update/<int:post_id>',methods=['GET','POST'])
@@ -118,6 +119,7 @@ def post_destroy(post_id):
 @login_required
 def post_delete():
     if request.method == "GET":
+        form = PostForm()
         fields = [Post.id, Post.post_title, Post.created_at, Post.updated_at]
         return admin_index(Post, fields=fields, url=blog_urls['index'], create_modal=False,
-                           view_modal=False, template='blog/post_delete_index.html')
+                           view_modal=False, template='blog/post_delete_index.html',form=form)
