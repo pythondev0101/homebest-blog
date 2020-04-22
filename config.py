@@ -31,7 +31,7 @@ class ProductionConfig(Config):
     """
     Production configurations
     """
-    SQLALCHEMY_DATABASE_URI = get_database()
+    SQLALCHEMY_DATABASE_URI = "mysql://crstnavlwrites:databasepassword@crstnavlwrites.mysql.pythonanywhere-services.com/crstnavlwrites$db_blog"
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
